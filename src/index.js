@@ -1,8 +1,5 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import grassShader from './shaders/grass.js';
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 // Parameters
 const PLANE_SIZE = 30;
@@ -11,32 +8,12 @@ const BLADE_WIDTH = 0.1;
 const BLADE_HEIGHT = 0.8;
 const BLADE_HEIGHT_VARIATION = 0.6;
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// Controls
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enablePan = false;
-controls.enableZoom = false;
-controls.minPolarAngle = 1.1;
-controls.maxPolarAngle = 1.45;
-controls.enableDamping = true;
-controls.dampingFactor = 0.1;
-controls.target.set(0, 0, 0);
-
-// Camera
-camera.position.set(-7, 3, 7);
-camera.lookAt(controls.target);
-camera.setFocalLength(15);
-
 // Grass Texture
-const grassTexture = new THREE.TextureLoader().load('grass.jpg');
-const cloudTexture = new THREE.TextureLoader().load('cloud.jpg');
+const grassTexture = new THREE.TextureLoader().load('/grass.jpg');
+const cloudTexture = new THREE.TextureLoader().load('/grass.jpg');
 cloudTexture.wrapS = cloudTexture.wrapT = THREE.RepeatWrapping;
 
 // Time Uniform
-const startTime = Date.now();
 const timeUniform = { type: 'f', value: 0.0 };
 
 // Grass Shader
@@ -51,24 +28,6 @@ const grassMaterial = new THREE.ShaderMaterial({
   fragmentShader: grassShader.frag,
   vertexColors: true,
   side: THREE.DoubleSide
-});
-
-generateField();
-
-const animate = function () {
-  const elapsedTime = Date.now() - startTime;
-  controls.update();
-  grassUniforms.iTime.value = elapsedTime;
-  window.requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-};
-
-animate();
-
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
 function convertRange (val, oldMin, oldMax, newMin, newMax) {
