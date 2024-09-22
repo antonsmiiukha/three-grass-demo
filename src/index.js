@@ -75,7 +75,7 @@ function convertRange (val, oldMin, oldMax, newMin, newMax) {
   return (((val - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
 }
 
-function generateField () {
+export function generateField () {
   const positions = [];
   const uvs = [];
   const indices = [];
@@ -114,7 +114,8 @@ function generateField () {
   geom.computeFaceNormals();
 
   const mesh = new THREE.Mesh(geom, grassMaterial);
-  scene.add(mesh);
+
+  return {mesh}
 }
 
 function generateBlade (center, vArrOffset, uv) {
