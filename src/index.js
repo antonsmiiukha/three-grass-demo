@@ -10,11 +10,11 @@ const BLADE_HEIGHT_VARIATION = 0.6;
 
 // Grass Texture
 const grassTexture = new THREE.TextureLoader().load('/grass.jpg');
-const cloudTexture = new THREE.TextureLoader().load('/grass.jpg');
+const cloudTexture = new THREE.TextureLoader().load('/cloud.jpg');
 cloudTexture.wrapS = cloudTexture.wrapT = THREE.RepeatWrapping;
 
 // Time Uniform
-const timeUniform = { type: 'f', value: 0.0 };
+const timeUniform = { value: 0.0 };
 
 // Grass Shader
 const grassUniforms = {
@@ -30,11 +30,11 @@ const grassMaterial = new THREE.ShaderMaterial({
   side: THREE.DoubleSide
 });
 
-function convertRange (val, oldMin, oldMax, newMin, newMax) {
+function convertRange(val, oldMin, oldMax, newMin, newMax) {
   return (((val - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
 }
 
-export function generateField () {
+export function generateField() {
   const positions = [];
   const uvs = [];
   const indices = [];
@@ -53,15 +53,18 @@ export function generateField () {
 
     const pos = new THREE.Vector3(x, 0, y);
 
-    const uv = [convertRange(pos.x, surfaceMin, surfaceMax, 0, 1), convertRange(pos.z, surfaceMin, surfaceMax, 0, 1)];
+    const uv = [
+      convertRange(pos.x, surfaceMin, surfaceMax, 0, 1),
+      convertRange(pos.z, surfaceMin, surfaceMax, 0, 1),
+    ];
 
     const blade = generateBlade(pos, i * VERTEX_COUNT, uv);
-    blade.verts.forEach(vert => {
+    blade.verts.forEach((vert) => {
       positions.push(...vert.pos);
       uvs.push(...vert.uv);
       colors.push(...vert.color);
     });
-    blade.indices.forEach(indice => indices.push(indice));
+    blade.indices.forEach((indice) => indices.push(indice));
   }
 
   const geom = new THREE.BufferGeometry();
@@ -74,25 +77,25 @@ export function generateField () {
 
   const mesh = new THREE.Mesh(geom, grassMaterial);
 
-  return {mesh}
+  return { mesh };
 }
 
-function generateBlade (center, vArrOffset, uv) {
+function generateBlade(center, vArrOffset, uv) {
   const MID_WIDTH = BLADE_WIDTH * 0.5;
   const TIP_OFFSET = 0.1;
-  const height = BLADE_HEIGHT + (Math.random() * BLADE_HEIGHT_VARIATION);
+  const height = BLADE_HEIGHT + Math.random() * BLADE_HEIGHT_VARIATION;
 
   const yaw = Math.random() * Math.PI * 2;
   const yawUnitVec = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
   const tipBend = Math.random() * Math.PI * 2;
   const tipBendUnitVec = new THREE.Vector3(Math.sin(tipBend), 0, -Math.cos(tipBend));
 
-  // Find the Bottom Left, Bottom Right, Top Left, Top right, Top Center vertex positions
-  const bl = new THREE.Vector3().addVectors(center, new THREE.Vector3().copy(yawUnitVec).multiplyScalar((BLADE_WIDTH / 2) * 1));
-  const br = new THREE.Vector3().addVectors(center, new THREE.Vector3().copy(yawUnitVec).multiplyScalar((BLADE_WIDTH / 2) * -1));
-  const tl = new THREE.Vector3().addVectors(center, new THREE.Vector3().copy(yawUnitVec).multiplyScalar((MID_WIDTH / 2) * 1));
-  const tr = new THREE.Vector3().addVectors(center, new THREE.Vector3().copy(yawUnitVec).multiplyScalar((MID_WIDTH / 2) * -1));
-  const tc = new THREE.Vector3().addVectors(center, new THREE.Vector3().copy(tipBendUnitVec).multiplyScalar(TIP_OFFSET));
+  // Vertex positions
+  const bl = center.clone().add(yawUnitVec.clone().multiplyScalar(BLADE_WIDTH / 2));
+  const br = center.clone().add(yawUnitVec.clone().multiplyScalar(-BLADE_WIDTH / 2));
+  const tl = center.clone().add(yawUnitVec.clone().multiplyScalar(MID_WIDTH / 2));
+  const tr = center.clone().add(yawUnitVec.clone().multiplyScalar(-MID_WIDTH / 2));
+  const tc = center.clone().add(tipBendUnitVec.clone().multiplyScalar(TIP_OFFSET));
 
   tl.y += height / 2;
   tr.y += height / 2;

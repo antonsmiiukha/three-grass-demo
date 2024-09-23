@@ -11,7 +11,7 @@
   "license": "SEE LICENSE IN FILE",
   "dependencies": {
     "esm": "^3.2.25",
-    "three": "^0.120.1"
+    "three": "^0.168.0"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^9.0.0",
